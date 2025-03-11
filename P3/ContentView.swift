@@ -32,7 +32,6 @@ struct ContentView: View {
                         .fontWeight(.semibold)
                     
                     HStack {
-                        // Label Reader Button
                         Button(action: {
                             isLabelReaderMode.toggle()
                             longHoldResult = nil
