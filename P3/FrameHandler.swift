@@ -6,11 +6,10 @@ import SwiftUI
 import Combine
 
 // MARK: - CameraViewModel
-
 class CameraViewModel: ObservableObject {
     @Published var currentFrame: CGImage?
     @Published var detectionResult: DetectionResult = .initializing
-    @Published var isVoiceModeEnabled: Bool = true // Voice Mode enabled by default
+    @Published var isVoiceModeEnabled: Bool = true
     
     private let cameraManager: CameraManager
     private let visionAnalyzer: VisionAnalyzer
@@ -49,7 +48,7 @@ class CameraViewModel: ObservableObject {
                 let result = try await visionAnalyzer.analyzeImage(frame, with: customPrompt)
                 await MainActor.run { [weak self] in
                     self?.detectionResult = result
-                    if self?.isVoiceModeEnabled == true { // Only speak if Voice Mode is enabled
+                    if self?.isVoiceModeEnabled == true {
                         self?.speakPrompt(result.displayText)
                     }
                 }
@@ -66,14 +65,12 @@ class CameraViewModel: ObservableObject {
     
     private func speakPrompt(_ text: String) {
         do {
-            // Set the audio session category to playback (ignores the silent switch)
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             print("Failed to set audio session category: \(error.localizedDescription)")
         }
 
-        // Stop any ongoing speech before starting a new one
         speechSynthesizer.stopSpeaking(at: .immediate)
 
         let speechUtterance = AVSpeechUtterance(string: text)
@@ -91,7 +88,7 @@ class CameraViewModel: ObservableObject {
     
     deinit {
         stopCapture()
-        speechSynthesizer.stopSpeaking(at: .immediate) // Stop TTS when the ViewModel is deinitialized
+        speechSynthesizer.stopSpeaking(at: .immediate)
     }
 }
 
@@ -317,7 +314,6 @@ enum DetectionResult: Equatable {
         }
     }
     
-    // Implement Equatable conformance
     static func == (lhs: DetectionResult, rhs: DetectionResult) -> Bool {
         switch (lhs, rhs) {
         case (.initializing, .initializing),
