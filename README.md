@@ -4,10 +4,10 @@ Narrator is an iOS app designed to assist individuals with hearing or vision imp
 
 ## 🚀 Features  
 
-✅ **AI-Powered Object & Environment Recognition** – Uses Google's Gemini AI to analyze visual input and generate captions  
-✅ **Real-Time Text-to-Speech** – Converts AI-generated descriptions into speech  
-✅ **Intuitive User Interface** – Designed with accessibility and ease of use in mind  
-✅ **Seamless iOS Integration** – Built with Swift and Apple’s native frameworks  
+- **AI-Powered Object & Environment Recognition** – Uses Google's Gemini AI to analyze visual input and generate captions  
+- **Real-Time Text-to-Speech** – Converts AI-generated descriptions into speech  
+- **Intuitive User Interface** – Designed with accessibility and ease of use in mind  
+- **Seamless iOS Integration** – Built with Swift and Apple’s native frameworks  
 
 ## 🛠️ Tech Stack  
 
