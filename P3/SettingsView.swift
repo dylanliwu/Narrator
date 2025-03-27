@@ -1,35 +1,42 @@
-//
-//  SettingsView.swift
-//  P3
-//
-//  Created by Dylan Li on 2025-03-10.
-//
-
 import SwiftUI
 
 struct SettingsView: View {
+    @ObservedObject var settings: AppSettings
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
-        VStack {
-            Text("Settings")
-                .font(.system(size: 54))
-                .fontWeight(.semibold)
-            GeometryReader { geometry in
-                VStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.blue)
-                        .padding(.horizontal, geometry.size.width * (1/12))
-                        .padding(.bottom, 20)
-                    
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.blue)
-                        .padding(.horizontal, geometry.size.width * (1/12))
+        NavigationView {
+            Form {
+                Section(header: Text("Text Appearance")) {
+                    ColorPicker("Text Color", selection: $settings.textColor)
+                }
+                
+                Section(header: Text("Text Size")) {
+                    Slider(value: $settings.textSize, in: 12...24, step: 1) {
+                        Text("Text Size")
+                    }
+                }
+                Section(header: Text("Button Size")) {
+                    Slider(value: $settings.iconSize, in: 16...40, step: 1) {
+                        Text("Icon Size")
+                    }
+                }
+
+                Section {
+                    Button("Reset to Defaults") {
+                        settings.resetToDefaults()
+                    }
+                    .foregroundColor(.red)
+                }
+            }
+            .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
                 }
             }
         }
-        .padding(.top, 25)
     }
-}
-
-#Preview {
-    SettingsView()
 }
