@@ -11,7 +11,8 @@ class CameraViewModel: ObservableObject {
     @Published var detectionResult: DetectionResult = .initializing
     @Published var isVoiceModeEnabled: Bool = true
     
-    private let cameraManager: CameraManager
+    let cameraManager: CameraManager
+    
     private let visionAnalyzer: VisionAnalyzer
     private var cancellables = Set<AnyCancellable>()
     private let speechSynthesizer = AVSpeechSynthesizer()
@@ -74,7 +75,17 @@ class CameraViewModel: ObservableObject {
         speechSynthesizer.stopSpeaking(at: .immediate)
 
         let speechUtterance = AVSpeechUtterance(string: text)
-        speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        
+        if let customVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_en-US_compact") {
+            speechUtterance.voice = customVoice
+        } else {
+            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        }
+
+        speechUtterance.rate = 0.5
+        speechUtterance.pitchMultiplier = 1.25
+        speechUtterance.volume = 1.0
+
         speechSynthesizer.speak(speechUtterance)
     }
     
@@ -100,6 +111,8 @@ class CameraManager: NSObject, ObservableObject {
     private let sessionQueue = DispatchQueue(label: "com.camera.sessionQueue", qos: .userInitiated)
     private let processingQueue = DispatchQueue(label: "com.camera.processingQueue", qos: .userInteractive)
     private let context = CIContext()
+    var lastZoomFactor: CGFloat = 1.0
+    private var currentDevice: AVCaptureDevice?
     
     override init() {
         super.init()
@@ -161,6 +174,7 @@ class CameraManager: NSObject, ObservableObject {
             return
         }
         captureSession.addInput(input)
+        currentDevice = camera
         
         let videoOutput = AVCaptureVideoDataOutput()
         videoOutput.setSampleBufferDelegate(self, queue: processingQueue)
@@ -181,7 +195,7 @@ class CameraManager: NSObject, ObservableObject {
             }
         }
         
-        captureSession.sessionPreset = .medium
+        captureSession.sessionPreset = .high
     }
     
     private func getBestCamera() -> AVCaptureDevice? {
@@ -189,6 +203,38 @@ class CameraManager: NSObject, ObservableObject {
             return ultraWideCamera
         }
         return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+    }
+    
+    func setZoomFactor(_ zoomFactor: CGFloat) {
+        guard let device = currentDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            let clampedZoomFactor = max(1.0, min(zoomFactor, device.activeFormat.videoMaxZoomFactor))
+            device.videoZoomFactor = clampedZoomFactor
+            device.unlockForConfiguration()
+            lastZoomFactor = clampedZoomFactor
+        } catch {
+            print("Failed to set zoom factor: \(error.localizedDescription)")
+        }
+    }
+    
+    func toggleFlashMode() {
+        guard let device = currentDevice, device.hasTorch else { return }
+        do {
+            try device.lockForConfiguration()
+            if device.torchMode == .on {
+                device.torchMode = .off
+            } else {
+                try device.setTorchModeOn(level: 1.0)
+            }
+            device.unlockForConfiguration()
+        } catch {
+            print("Failed to toggle flash: \(error.localizedDescription)")
+        }
+    }
+
+    func isFlashOn() -> Bool {
+        return currentDevice?.torchMode == .on
     }
 }
 
