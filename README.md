@@ -16,7 +16,8 @@ Narrator is an iOS app designed to assist individuals with hearing or vision imp
 - **CoreImage** – Processes images for AI analysis  
 - **UIKit** – Enhances UI components and interaction
 
-[![Screenshot 2025-04-09 221737](https://github.com/user-attachments/assets/63f613c3-de69-4f74-99cc-c7a04f162fba)](https://github.com/user-attachments/assets/72dc2596-e5c1-4335-93d9-ab94cbddae96)
+https://github.com/user-attachments/assets/3af860e6-ba4a-4061-a76e-6edb7fd43cdd
+
 
 
 
